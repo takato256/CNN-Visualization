@@ -4,32 +4,34 @@ import numpy as np
 from tensorflow.keras import models
 import matplotlib.pyplot as plt
 
+st.title("CNN可視化ツール")
+
 # streamlit上での警告を表示しないようにする
-st.set_option('deprecation.showPyplotGlobalUse', False)
+st.set_option("deprecation.showPyplotGlobalUse", False)
 # 学習済みモデル「cats_and_dogs_small_1.h5」を用いる
-model = models.load_model('cats_and_dogs_small_1.h5')
+model = models.load_model("cats_and_dogs_small_1.h5")
 
 # チェックボックスの種類
-cats_dogs_var = st.selectbox("ネコ・イヌの種類",("cat1", "cat2", "cat3", "dog1", "dog2", "dog3"))
+cats_dogs_var = st.selectbox("画像を選択してください",("cat1", "cat2", "cat3", "dog1", "dog2", "dog3"))
 
 # 可視化する画像を選択
 if cats_dogs_var == "cat1":
-    img_path = 'dog_cat_img/cat.1.jpg'
+    img_path = "dog_cat_img/cat.1.jpg"
 
 elif cats_dogs_var == "cat2":
-    img_path = 'dog_cat_img/cat.2.jpg'
+    img_path = "dog_cat_img/cat.2.jpg"
 
 elif cats_dogs_var == "cat3":
-    img_path = 'dog_cat_img/cat.3.jpg'
+    img_path = "dog_cat_img/cat.3.jpg"
 
 elif cats_dogs_var == "dog1":
-    img_path = 'dog_cat_img/dog.1.jpg'
+    img_path = "dog_cat_img/dog.1.jpg"
     
 elif cats_dogs_var == "dog2":
-    img_path = 'dog_cat_img/dog.2.jpg'
+    img_path = "dog_cat_img/dog.2.jpg"
     
 elif cats_dogs_var == "dog3":
-    img_path = 'dog_cat_img/dog.3.jpg'
+    img_path = "dog_cat_img/dog.3.jpg"
 
 img = image.load_img(img_path, target_size=(150, 150))
 img_tensor = image.img_to_array(img)
@@ -51,7 +53,7 @@ activations = activation_model.predict(img_tensor)
 first_layer_activation = activations[0]
 
 # 最初の層の活性化の3番目のチャネル
-plt.matshow(first_layer_activation[0, :, :, 3], cmap='viridis')
+plt.matshow(first_layer_activation[0, :, :, 3], cmap="viridis")
 st.pyplot()
 
 # プロットの一部として使用する層の名前
@@ -84,7 +86,7 @@ for layer_name, layer_activation in zip(layer_names, activations):
             channel_image /= channel_image.std()
             channel_image *= 64
             channel_image += 128
-            channel_image = np.clip(channel_image, 0, 255).astype('uint8')
+            channel_image = np.clip(channel_image, 0, 255).astype("uint8")
             display_grid[col * size : (col + 1) * size,
                         row * size : (row + 1) * size] = channel_image
 
@@ -94,6 +96,6 @@ for layer_name, layer_activation in zip(layer_names, activations):
                         scale * display_grid.shape[0]))
     plt.title(layer_name)
     plt.grid(False)
-    plt.imshow(display_grid, aspect='auto', cmap='viridis')
+    plt.imshow(display_grid, aspect="auto", cmap="viridis")
     
     st.pyplot()
