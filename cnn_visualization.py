@@ -1,7 +1,7 @@
 import streamlit as st
-from keras.preprocessing import image
+from tensorflow.keras.preprocessing import image
 import numpy as np
-from keras import models
+from tensorflow.keras import models
 import matplotlib.pyplot as plt
 
 # streamlit上での警告を表示しないようにする
