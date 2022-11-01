@@ -4,8 +4,11 @@ import numpy as np
 from tensorflow.keras import models
 import matplotlib.pyplot as plt
 
-st.title("CNN可視化ツール")
-
+st.markdown("# 畳み込みニューラルネットワーク")
+st.markdown("ここでは畳み込みニューラルネットワーク(CNN)を詳しく見ることができます")
+if st.button("CNNとは"):
+    st.markdown("### CNNとは")
+    st.markdown("畳み込み層(Convolution Layer)とプーリング層(Pooling Layer)から構成されるニューラルネットワークのことです。")
 # streamlit上での警告を表示しないようにする
 st.set_option("deprecation.showPyplotGlobalUse", False)
 # 学習済みモデル「cats_and_dogs_small_1.h5」を用いる
@@ -41,6 +44,7 @@ img_tensor /= 255.
 plt.imshow(img_tensor[0])
 
 # オリジナル画像を表示
+st.markdown("## オリジナル画像")
 st.pyplot()
 
 # 出力側の8つの層から出力を抽出
@@ -54,14 +58,14 @@ first_layer_activation = activations[0]
 
 # 最初の層の活性化の3番目のチャネル
 plt.matshow(first_layer_activation[0, :, :, 3], cmap="viridis")
+st.markdown("## 例：畳み込み層の特徴量検出")
 st.pyplot()
 
 # プロットの一部として使用する層の名前
-layer_names = []
-for layer in model.layers[:8]:
-    layer_names.append(layer.name)
+layer_names = ["畳み込み層 1", "プーリング層 1", "畳み込み層 2", "プーリング層 2", "畳み込み層 3", "プーリング層 3", "畳み込み層 4", "プーリング層 4"]
 
 images_per_row = 16
+
 
 # 特徴マップを表示
 for layer_name, layer_activation in zip(layer_names, activations):
@@ -94,8 +98,10 @@ for layer_name, layer_activation in zip(layer_names, activations):
     scale = 1. / size
     plt.figure(figsize=(scale * display_grid.shape[1],
                         scale * display_grid.shape[0]))
-    plt.title(layer_name)
     plt.grid(False)
     plt.imshow(display_grid, aspect="auto", cmap="viridis")
     
+    st.markdown("#### {}".format(layer_name))
     st.pyplot()
+    if st.button("{} のフィルター".format(layer_name)):
+        st.markdown("フィルター画像")
