@@ -4,37 +4,23 @@ import numpy as np
 from tensorflow.keras import models
 import matplotlib.pyplot as plt
 
-st.markdown("# 畳み込みニューラルネットワーク")
-st.markdown("ここでは畳み込みニューラルネットワーク(CNN)を詳しく見ることができます")
-if st.button("CNNとは"):
-    st.markdown("### CNNとは")
-    st.markdown("畳み込み層(Convolution Layer)とプーリング層(Pooling Layer)から構成されるニューラルネットワークのことです。")
 # streamlit上での警告を表示しないようにする
 st.set_option("deprecation.showPyplotGlobalUse", False)
 # 学習済みモデル「cats_and_dogs_small_1.h5」を用いる
 model = models.load_model("cats_and_dogs_small_1.h5")
 
-# チェックボックスの種類
-cats_dogs_var = st.selectbox("画像を選択してください",("cat1", "cat2", "cat3", "dog1", "dog2", "dog3"))
+st.markdown("# 畳み込みニューラルネットワーク")
+st.markdown("ここでは畳み込みニューラルネットワーク(CNN)を詳しく見ることができます")
 
+# 画像を選択
+cats_dogs_var = st.sidebar.selectbox("画像を選択してください",("cat1", "cat2", "cat3", "dog1", "dog2", "dog3"))
 # 可視化する画像を選択
-if cats_dogs_var == "cat1":
-    img_path = "dog_cat_img/cat.1.jpg"
+img_path = "dog_cat_img/{}.jpg".format(cats_dogs_var)
 
-elif cats_dogs_var == "cat2":
-    img_path = "dog_cat_img/cat.2.jpg"
-
-elif cats_dogs_var == "cat3":
-    img_path = "dog_cat_img/cat.3.jpg"
-
-elif cats_dogs_var == "dog1":
-    img_path = "dog_cat_img/dog.1.jpg"
-    
-elif cats_dogs_var == "dog2":
-    img_path = "dog_cat_img/dog.2.jpg"
-    
-elif cats_dogs_var == "dog3":
-    img_path = "dog_cat_img/dog.3.jpg"
+# CNNの説明を表示
+if st.sidebar.button("CNNとは"):
+    st.markdown("### CNNとは")
+    st.markdown("畳み込み層(Convolution Layer)とプーリング層(Pooling Layer)から構成されるニューラルネットワークのことです。")
 
 img = image.load_img(img_path, target_size=(150, 150))
 img_tensor = image.img_to_array(img)
