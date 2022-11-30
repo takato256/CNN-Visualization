@@ -31,71 +31,44 @@ def original_img():
     
     return img_tensor
 
+# 特徴量マップを表示
+def cnn_vis(layer_activation, layer_name, images_per_row, model):
 
-def cnn_vis(img_tensor, model):
+    # 特徴マップに含まれている特徴量の数
+    n_features = layer_activation.shape[-1]
 
-    # 出力側の8つの層から出力を抽出
-    layer_outputs = [layer.output for layer in model.layers[:8]]
-    # 特定の入力をもとに、これらの出力を返すモデルを作成
-    activation_model = models.Model(inputs=model.input, outputs=layer_outputs)
-    # 5つのNumpy配列(層の活性化ごとに1つ)のリストを返す
-    activations = activation_model.predict(img_tensor)
+    # 特徴マップの形状 (1, size, size, n_features)
+    size = layer_activation.shape[1]
 
+    # この行列で活性化チャネルをタイル表示
+    n_cols = n_features // images_per_row
+    display_grid = np.zeros((size * n_cols, images_per_row * size))
 
-    # 畳み込み演算の説明
-    if st.sidebar.button("畳み込み演算とは？"):
-        st.sidebar.markdown("データに含まれるノイズを緩和し、重要な情報を抽出するために使われる演算")
-    
-    # 最大値プーリング演算の説明
-    if st.sidebar.button("最大値プーリング演算とは？"):
-        st.sidebar.markdown("最大値プーリング演算の説明")
+    # 各フィルタを1つの大きな水平グリッドでタイル表示
+    for col in range(n_cols):
+        for row in range(images_per_row):
+            channel_image = layer_activation[0,
+                                            :, :,
+                                            col * images_per_row + row]
+            # 特徴量の見た目をよくするための後処理
+            channel_image -= channel_image.mean()
+            channel_image /= channel_image.std()
+            channel_image *= 64
+            channel_image += 128
+            channel_image = np.clip(channel_image, 0, 255).astype("uint8")
+            display_grid[col * size : (col + 1) * size,
+                        row * size : (row + 1) * size] = channel_image
 
-    # プロットの一部として使用する層の名前
-    layer_names = ["畳み込み層 1", "プーリング層 1", "畳み込み層 2", "プーリング層 2", "畳み込み層 3", "プーリング層 3", "畳み込み層 4", "プーリング層 4"]
-
-    images_per_row = 16
-
-
-    # 特徴マップを表示
-    for layer_name, layer_activation in zip(layer_names, activations):
-        # 特徴マップに含まれている特徴量の数
-        n_features = layer_activation.shape[-1]
-
-        # 特徴マップの形状 (1, size, size, n_features)
-        size = layer_activation.shape[1]
-
-        # この行列で活性化チャネルをタイル表示
-        n_cols = n_features // images_per_row
-        display_grid = np.zeros((size * n_cols, images_per_row * size))
-
-        # 各フィルタを1つの大きな水平グリッドでタイル表示
-        for col in range(n_cols):
-            for row in range(images_per_row):
-                channel_image = layer_activation[0,
-                                                :, :,
-                                                col * images_per_row + row]
-                # 特徴量の見た目をよくするための後処理
-                channel_image -= channel_image.mean()
-                channel_image /= channel_image.std()
-                channel_image *= 64
-                channel_image += 128
-                channel_image = np.clip(channel_image, 0, 255).astype("uint8")
-                display_grid[col * size : (col + 1) * size,
-                            row * size : (row + 1) * size] = channel_image
-
-        # グリッド表示
-        scale = 1. / size
-        plt.figure(figsize=(scale * display_grid.shape[1],
+    # グリッド表示
+    scale = 1. / size
+    plt.figure(figsize=(scale * display_grid.shape[1],
                             scale * display_grid.shape[0]))
-        plt.grid(False)
-        plt.imshow(display_grid, aspect="auto", cmap="viridis")
+    plt.grid(False)
+    plt.imshow(display_grid, aspect="auto", cmap="viridis")
     
-        st.markdown("#### {}".format(layer_name))
-        st.pyplot()
+    st.markdown("#### {}".format(layer_name))
+    st.pyplot()
     
-        if "畳み込み層" in layer_name:
-            if st.button("{} のフィルター".format(layer_name)):
-                filter_vis(model, layer_name)
 
 def deprocess_image(x):
     x -= x.mean()
@@ -172,8 +145,56 @@ def main():
 
     st.markdown("# 畳み込みニューラルネットワーク")
     
-    img_tendor = original_img()
-    cnn_vis(img_tendor, model)
+    # オリジナル画像を表示
+    img_tensor = original_img()
+    
+    # 出力側の8つの層から出力を抽出
+    layer_outputs = [layer.output for layer in model.layers[:8]]
+    # 特定の入力をもとに、これらの出力を返すモデルを作成
+    activation_model = models.Model(inputs=model.input, outputs=layer_outputs)
+    # 5つのNumpy配列(層の活性化ごとに1つ)のリストを返す
+    activations = activation_model.predict(img_tensor)
+
+    # プロットの一部として使用する層の名前
+    layer_names = ["畳み込み層 1", "プーリング層 1", "畳み込み層 2", "プーリング層 2", "畳み込み層 3", "プーリング層 3", "畳み込み層 4", "プーリング層 4"]
+    
+    images_per_row = 16
+    
+    # 畳み込み層 1 を表示
+    cnn_vis(activations[0], layer_names[0], images_per_row, model)
+    if st.button("{} のフィルター".format(layer_names[0])):
+        filter_vis(model, layer_names[0])
+    st.markdown(""" 畳み込み層は、入力画像をより特徴が強調されたものに変換します。
+                特徴を検出する際に、画像の局所性を利用します。""")
+    st.markdown("※局所性‥各ピクセルが近傍のピクセルと強い関連性を持っている性質のこと")
+    
+    # プーリング層 1 を表示
+    cnn_vis(activations[1], layer_names[1], images_per_row, model)
+    st.markdown("プーリング層は、画像を各領域に区切り、各領域を代表する値を抽出し、並べて新たな画像を生成します。")
+    
+    # 畳み込み層 2 を表示
+    cnn_vis(activations[2], layer_names[2], images_per_row, model)
+    if st.button("{} のフィルター".format(layer_names[2])):
+        filter_vis(model, layer_names[2])
+    
+    # プーリング層 2 を表示
+    cnn_vis(activations[3], layer_names[3], images_per_row, model)
+    
+    # 畳み込み層 3 を表示
+    cnn_vis(activations[4], layer_names[4], images_per_row, model)
+    if st.button("{} のフィルター".format(layer_names[4])):
+        filter_vis(model, layer_names[4])
+    
+    # プーリング層 3 を表示
+    cnn_vis(activations[5], layer_names[5], images_per_row, model)
+    
+    # 畳み込み層 4 を表示
+    cnn_vis(activations[6], layer_names[6], images_per_row, model)
+    if st.button("{} のフィルター".format(layer_names[6])):
+        filter_vis(model, layer_names[6])
+    
+    # プーリング層 4 を表示
+    cnn_vis(activations[7], layer_names[7], images_per_row, model)
     
 if __name__ == "__main__":
     main()
