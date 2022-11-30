@@ -13,10 +13,6 @@ def original_img():
     cats_dogs_var = st.sidebar.selectbox("画像を選択してください",("cat1", "cat2", "cat3", "dog1", "dog2", "dog3"))
     # 可視化する画像を選択
     img_path = "dog_cat_img/{}.jpg".format(cats_dogs_var)
-
-    # CNNの説明
-    if st.sidebar.button("CNNとは？"):
-        st.sidebar.markdown("畳み込み層(Convolution Layer)とプーリング層(Pooling Layer)から構成されるニューラルネットワークのことです。")
         
     img = image.load_img(img_path, target_size=(150, 150))
     img_tensor = image.img_to_array(img)
@@ -26,7 +22,7 @@ def original_img():
     plt.imshow(img_tensor[0])
 
     # オリジナル画像を表示
-    st.markdown("## オリジナル画像")
+    st.markdown("### オリジナル画像")
     st.pyplot()
     
     return img_tensor
@@ -143,7 +139,7 @@ def main():
     # 学習済みモデル「cats_and_dogs_small_1.h5」を用いる
     model = models.load_model("cats_and_dogs_small_1.h5")
 
-    st.markdown("# 畳み込みニューラルネットワーク")
+    st.markdown("## 畳み込みニューラルネットワーク(CNN)")
     
     # オリジナル画像を表示
     img_tensor = original_img()
@@ -161,40 +157,57 @@ def main():
     images_per_row = 16
     
     # 畳み込み層 1 を表示
-    cnn_vis(activations[0], layer_names[0], images_per_row, model)
+    with st.spinner("畳み込み層 1 を読み込み中‥"):
+        cnn_vis(activations[0], layer_names[0], images_per_row, model)
     if st.button("{} のフィルター".format(layer_names[0])):
-        filter_vis(model, layer_names[0])
-    st.markdown(""" 畳み込み層は、入力画像をより特徴が強調されたものに変換します。
-                特徴を検出する際に、画像の局所性を利用します。""")
-    st.markdown("※局所性‥各ピクセルが近傍のピクセルと強い関連性を持っている性質のこと")
+        with st.spinner("フィルターを読み込み中‥"):
+            filter_vis(model, layer_names[0])
+    st.markdown("畳み込み層は、入力画像をより特徴が強調されたものに変換します。")
+    st.markdown("特徴を検出する際に、画像の局所性を利用します。") 
+    st.markdown("※ 局所性‥各ピクセルが近傍のピクセルと強い関連性を持っている性質のこと")
     
     # プーリング層 1 を表示
-    cnn_vis(activations[1], layer_names[1], images_per_row, model)
-    st.markdown("プーリング層は、画像を各領域に区切り、各領域を代表する値を抽出し、並べて新たな画像を生成します。")
+    with st.spinner("プーリング層 1 を読み込み中‥"):
+        cnn_vis(activations[1], layer_names[1], images_per_row, model)
+        st.markdown("プーリング層は、画像を各領域に区切り、各領域を代表する値を抽出します。")
     
     # 畳み込み層 2 を表示
-    cnn_vis(activations[2], layer_names[2], images_per_row, model)
+    with st.spinner("畳み込み層 2 を読み込み中‥"):
+        cnn_vis(activations[2], layer_names[2], images_per_row, model)
     if st.button("{} のフィルター".format(layer_names[2])):
-        filter_vis(model, layer_names[2])
+        with st.spinner("フィルターを読み込み中‥"):
+            filter_vis(model, layer_names[2])
     
     # プーリング層 2 を表示
-    cnn_vis(activations[3], layer_names[3], images_per_row, model)
+    with st.spinner("プーリング層 2 を読み込み中‥"):
+        cnn_vis(activations[3], layer_names[3], images_per_row, model)
+        st.markdown("この層ではまだ、画像に存在している情報のほぼ全てが活性化に含まれています。")
     
     # 畳み込み層 3 を表示
-    cnn_vis(activations[4], layer_names[4], images_per_row, model)
+    with st.spinner("畳み込み層 3 を読み込み中‥"):
+        cnn_vis(activations[4], layer_names[4], images_per_row, model)
     if st.button("{} のフィルター".format(layer_names[4])):
-        filter_vis(model, layer_names[4])
+        with st.spinner("フィルターを読み込み中‥"):
+            filter_vis(model, layer_names[4])
     
     # プーリング層 3 を表示
-    cnn_vis(activations[5], layer_names[5], images_per_row, model)
+    with st.spinner("プーリング層 3 を読み込み中‥"):
+        cnn_vis(activations[5], layer_names[5], images_per_row, model)
+        st.markdown("次の層へ進むに連れ、活性化は徐々に抽象化されていきます。")
+        st.markdown("そして、視覚的な解釈可能性は低下していきます。")
     
     # 畳み込み層 4 を表示
-    cnn_vis(activations[6], layer_names[6], images_per_row, model)
+    with st.spinner("畳み込み層 4 を読み込み中‥"):
+        cnn_vis(activations[6], layer_names[6], images_per_row, model)
     if st.button("{} のフィルター".format(layer_names[6])):
-        filter_vis(model, layer_names[6])
+        with st.spinner("フィルターを読み込み中‥"):
+            filter_vis(model, layer_names[6])
     
     # プーリング層 4 を表示
-    cnn_vis(activations[7], layer_names[7], images_per_row, model)
+    with st.spinner("プーリング層 4 を読み込み中‥"):
+        cnn_vis(activations[7], layer_names[7], images_per_row, model)
+        st.markdown("この層まで進むと、元の画像の猫や犬が視覚的には全くわからなくなります。")
+        st.markdown("活性化された画像は、「猫の耳」や「犬の目」などいった高レベルの概念をエンコードするようになります。")
     
 if __name__ == "__main__":
     main()
