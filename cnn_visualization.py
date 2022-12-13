@@ -10,7 +10,7 @@ tf.compat.v1.disable_eager_execution()
 
 def original_img():
     # 画像を選択
-    cats_dogs_var = st.sidebar.selectbox("画像を選択してください",("cat1", "cat2", "cat3", "dog1", "dog2", "dog3"))
+    cats_dogs_var = st.sidebar.selectbox("画像を選択してください",("cat1", "cat2", "cat3", "cat4", "cat5", "cat6", "cat7", "cat8", "cat9", "cat10", "dog1", "dog2", "dog3", "dog4", "dog5", "dog6", "dog7", "dog8", "dog9", "dog10", ))
     # 可視化する画像を選択
     img_path = "dog_cat_img/{}.jpg".format(cats_dogs_var)
         
