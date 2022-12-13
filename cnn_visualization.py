@@ -140,6 +140,14 @@ def main():
     model = models.load_model("cats_and_dogs_small_1.h5")
 
     st.markdown("## 畳み込みニューラルネットワーク(CNN)")
+    st.markdown(""" **畳み込みニューラルネットワーク** (Convolution Neural Network)は、主に画像識別の分野で使われています。
+                CNNは、**畳み込み層** (Convolutional Layer), **プーリング層** (Pooling Layer), **全結合層** (Full Connected Layer)から構成されています。""")
+    st.markdown("このサイトでは、畳み込み層とプーリング層の処理を見ることができます。")
+    
+    
+    st.sidebar.markdown("### CNNは画像のどこを見ているのか？")
+    st.sidebar.markdown("CNNは、何かを判別する際に対象物の**特徴的な部分**に着目しています。")
+    st.sidebar.markdown("画像を選択して、実際にCNNの処理を見てみましょう。")
     
     # オリジナル画像を表示
     img_tensor = original_img()
@@ -159,48 +167,49 @@ def main():
     # 畳み込み層 1 を表示
     with st.spinner("畳み込み層 1 を読み込み中‥"):
         cnn_vis(activations[0], layer_names[0], images_per_row, model)
-    if st.button("{} のフィルター".format(layer_names[0])):
-        with st.spinner("フィルターを読み込み中‥"):
+    if st.button("{} のフィルタ".format(layer_names[0])):
+        with st.spinner("フィルタを読み込み中‥"):
             filter_vis(model, layer_names[0])
-    st.markdown("畳み込み層は、入力画像をより特徴が強調されたものに変換します。")
-    st.markdown("特徴を検出する際に、画像の局所性を利用します。") 
+    st.markdown(" **畳み込み層** は、複数の **フィルタ** を用いて画像の特徴量を抽出します。")
+    st.markdown("特徴を検出する際に、画像の**局所性**を利用します。") 
     st.markdown("※ 局所性‥各ピクセルが近傍のピクセルと強い関連性を持っている性質のこと")
     
     # プーリング層 1 を表示
     with st.spinner("プーリング層 1 を読み込み中‥"):
         cnn_vis(activations[1], layer_names[1], images_per_row, model)
-        st.markdown("プーリング層は、画像を各領域に区切り、各領域を代表する値を抽出します。")
+        st.markdown(""" **プーリング層** は、画像サイズを **縮小** させ、計算量を減らし、認識対象の **位置変化** に対する柔軟性を向上させます。
+                    (画像中の位置が違っていても同じように認識できる)""")
     
     # 畳み込み層 2 を表示
     with st.spinner("畳み込み層 2 を読み込み中‥"):
         cnn_vis(activations[2], layer_names[2], images_per_row, model)
-    if st.button("{} のフィルター".format(layer_names[2])):
-        with st.spinner("フィルターを読み込み中‥"):
+    if st.button("{} のフィルタ".format(layer_names[2])):
+        with st.spinner("フィルタを読み込み中‥"):
             filter_vis(model, layer_names[2])
     
     # プーリング層 2 を表示
     with st.spinner("プーリング層 2 を読み込み中‥"):
         cnn_vis(activations[3], layer_names[3], images_per_row, model)
-        st.markdown("この層ではまだ、画像に存在している情報のほぼ全てが活性化に含まれています。")
+        st.markdown("畳み込み層からプーリング層へ移るにつれ、サイズがどんどん小さくなっていきます。")
     
     # 畳み込み層 3 を表示
     with st.spinner("畳み込み層 3 を読み込み中‥"):
         cnn_vis(activations[4], layer_names[4], images_per_row, model)
-    if st.button("{} のフィルター".format(layer_names[4])):
-        with st.spinner("フィルターを読み込み中‥"):
+    if st.button("{} のフィルタ".format(layer_names[4])):
+        with st.spinner("フィルタを読み込み中‥"):
             filter_vis(model, layer_names[4])
     
     # プーリング層 3 を表示
     with st.spinner("プーリング層 3 を読み込み中‥"):
         cnn_vis(activations[5], layer_names[5], images_per_row, model)
-        st.markdown("次の層へ進むに連れ、活性化は徐々に抽象化されていきます。")
+        st.markdown("次の層へ進むに連れ、活性化は徐々に**抽象化**されていきます。")
         st.markdown("そして、視覚的な解釈可能性は低下していきます。")
     
     # 畳み込み層 4 を表示
     with st.spinner("畳み込み層 4 を読み込み中‥"):
         cnn_vis(activations[6], layer_names[6], images_per_row, model)
-    if st.button("{} のフィルター".format(layer_names[6])):
-        with st.spinner("フィルターを読み込み中‥"):
+    if st.button("{} のフィルタ".format(layer_names[6])):
+        with st.spinner("フィルタを読み込み中‥"):
             filter_vis(model, layer_names[6])
     
     # プーリング層 4 を表示
@@ -208,6 +217,7 @@ def main():
         cnn_vis(activations[7], layer_names[7], images_per_row, model)
         st.markdown("この層まで進むと、元の画像の猫や犬が視覚的には全くわからなくなります。")
         st.markdown("活性化された画像は、「猫の耳」や「犬の目」などいった高レベルの概念をエンコードするようになります。")
+        st.markdown("こういった特徴を何千、何万も学習することにより判別を可能にしています。")
     
 if __name__ == "__main__":
     main()
